@@ -24,6 +24,7 @@
 
         .import-buttons {
             margin: 2rem auto;
+            width: 10rem;
         }
     </style>
     <script>
@@ -39,11 +40,17 @@
 <body>
     <div class="main-container">
         <div class="main-title">URC IMPORTER</div>
-        <div class="importer-title">PRODUCT IMPORTER</div>
         <form action="{{ route('importProducts') }}" method="POST" enctype="multipart/form-data">
             @csrf
+            <div class="importer-title">PRODUCT IMPORTER</div>
             <input type="file" name="product_file" class="importer-input">
             <button class="import-buttons">IMPORT PRODUCTS</button>
+        </form>
+        <form action="{{ route('importAdminUsers') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="importer-title">ADMIN IMPORTER</div>
+            <input type="file" name="admin_user_file" class="importer-input">
+            <button class="import-buttons">IMPORT ADMINS</button>
         </form>
     </div>
 </body>

@@ -2,9 +2,15 @@
 
 namespace App;
 
+use App\Imports\AdminUsersImport;
+use App\Imports\DistributorUsersImport;
+use App\Imports\DistributorOwnerImport;
+use App\Imports\DealerOwnerImport;
+use App\Imports\DealerUsersImport;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Maatwebsite\Excel\Facades\Excel;
 
 class User extends Authenticatable
 {
@@ -16,7 +22,9 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'first_name', 'middle_name', 'last_name', 'email', 'mobile_number', 'password', 'group', 'access',  
+        'street', 'barangay', 'city', 'province', 'zone', 'region', 'zip_code', 'photo', 'sales_coordinator', 'capacity',
+        'is_owner',
     ];
 
     /**
@@ -36,4 +44,11 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public static function importAdminUsers($file)
+    {
+        Excel::import(new AdminUsersImport,$file);
+           
+        return redirect()->back()->with('message', 'Import Successful!');
+    }
 }

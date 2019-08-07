@@ -21,3 +21,4 @@ Route::get('/', function(){
 });
 
 Route::post('importProducts', 'ProductController@importProducts')->name('importProducts');
+Route::post('importAdminUsers', 'UserController@importAdminUsers')->name('importAdminUsers');
