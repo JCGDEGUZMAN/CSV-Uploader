@@ -12,9 +12,12 @@ use App\Http\Controllers\ProductController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+Route::get('/', function(){
+    return view('import');
 });
 
-Route::get('import', 'ProductController@urcImportView');
 Route::post('importProducts', 'ProductController@importProducts')->name('importProducts');
