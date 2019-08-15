@@ -16,6 +16,6 @@ class Products extends Model
     {
         Excel::import(new ProductsImport,$file);
            
-        return redirect()->back()->with('message', 'Import Successful!');
+        return redirect()->back()->with('message', 'Product Import Successful!');
     }
 }

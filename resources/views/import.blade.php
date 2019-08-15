@@ -24,16 +24,24 @@
 
         .import-buttons {
             margin: 2rem auto;
-            width: 10rem;
+            width: 15rem;
         }
     </style>
     <script>
-        var msg = '{{session()->get('message')}}';
-        var exist = '{{session()->has('message')}}';
+        var success_msg = '{{session()->get('message')}}';
+        var success_exist = '{{session()->has('message')}}';
 
-        if(exist)
+        if(success_exist)
         {
-            alert(msg);
+            alert(success_msg);
+        }
+
+        var error_msg = '{{session()->get('error')}}';
+        var error_exist = '{{session()->has('error')}}';
+
+        if(error_exist)
+        {
+            alert(error_msg);
         }
     </script>
 </head>
@@ -43,14 +51,20 @@
         <form action="{{ route('importProducts') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="importer-title">PRODUCT IMPORTER</div>
-            <input type="file" name="product_file" class="importer-input">
+            <input type="file" name="product_file" class="importer-input" required>
             <button class="import-buttons">IMPORT PRODUCTS</button>
         </form>
         <form action="{{ route('importAdminUsers') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="importer-title">ADMIN IMPORTER</div>
-            <input type="file" name="admin_user_file" class="importer-input">
+            <input type="file" name="admin_user_file" class="importer-input" required>
             <button class="import-buttons">IMPORT ADMINS</button>
+        </form>
+        <form action="{{ route('importDistributors') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="importer-title">DISTRIBUTOR IMPORTER</div>
+            <input type="file" name="distributor_user_file" class="importer-input" required>
+            <button class="import-buttons">IMPORT DISTRIBUTORS</button>
         </form>
     </div>
 </body>

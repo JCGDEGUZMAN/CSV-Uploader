@@ -11,4 +11,9 @@ class UserController extends Controller
     {
         return User::importAdminUsers(request()->file('admin_user_file'));
     }
+
+    public function importDistributors()
+    {
+        return User::importDistributors(request()->file('distributor_user_file'));
+    }
 }

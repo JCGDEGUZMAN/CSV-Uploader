@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Distributor;
+Use App\DistributorUser;
 use App\Imports\AdminUsersImport;
 use App\Imports\DistributorUsersImport;
 use App\Imports\DistributorOwnerImport;
@@ -11,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -49,6 +52,130 @@ class User extends Authenticatable
     {
         Excel::import(new AdminUsersImport,$file);
            
-        return redirect()->back()->with('message', 'Import Successful!');
+        return redirect()->back()->with('message', 'Admin Import Successful!');
     }
+
+    public static function importDistributors($file)
+    {
+        $unique_exist_row = [];
+        $success = " ";
+
+        $data = self::convertCsvFileDataToArray($file);
+
+        $rows = count($data);
+
+        for($i = 1; $i<$rows-1; $i++)
+        {
+            $email_exist = self::where('email', '=', $data[$i][4])->first();
+
+            if(!$email_exist)
+            {
+
+                $user_id = 0;
+                $distributor_id = 0;
+
+                $user_id = self::saveOnUsersTable($data[$i], 2);
+
+                $distributor = new Distributor;
+
+                $distributor->company_name = $data[$i][0];
+                $distributor->assigned_categories = $data[$i][13];
+
+                if($distributor->save())
+                {
+                    $distributor_id = $distributor->id;
+                }
+
+                $distributor_user = new DistributorUser;
+
+                $distributor_user->user_id = $user_id;
+                $distributor_user->distributor_id =$distributor_id;
+                $distributor_user->is_distributor = 1;
+
+                if ($distributor_user->save()) {
+
+                    $success =  self::saveDistributorUserOwner($data[$i],$distributor_id);
+                }
+
+            }else{
+                array_push($unique_exist_row, $i+1);
+            }
+        }
+
+        if($unique_exist_row)
+        {
+            return redirect()->back()->with('error', 'Email in row(s) '. implode(', ',$unique_exist_row) . ' already EXIST not save in DB');
+        
+        }else{
+
+            return redirect()->back()->with('message', $success);
+        }
+    }
+
+    public static function saveDistributorUserOwner($data, $distributor_id)
+    {
+            $user_id = self::saveUserOwner($data, 2);
+
+            $distributor_user = new DistributorUser;
+
+            $distributor_user->user_id =  $user_id;
+            $distributor_user->distributor_id =$distributor_id;
+            $distributor_user->is_distributor = 0;
+
+            if ($distributor_user->save()) {
+
+                return 'Distributor Import Successful!';
+            }
+    }
+
+    public static function convertCsvFileDataToArray($file)
+    {
+        $file = file_get_contents($file);  
+
+        $array_data = array_map("str_getcsv", preg_split('/\r*\n+|\r+/', $file));
+
+        return  $array_data;
+    }
+
+    public static function saveOnUsersTable($data, $group)
+    {
+        $user = new User;
+
+        $user->group = $group;
+        $user->access = $data[16];
+        $user->street = $data[11];
+        $user->barangay = $data[10];
+        $user->city = $data[9];
+        $user->province = $data[8];
+        $user->zone = $data[7];
+        $user->region = $data[6];
+        $user->zip_code = $data[12];
+        $user->sales_coordinator = $data[14];
+        $user->capacity = $data[15];
+
+        if($user->save())
+        {
+            return $user->id;
+        }
+    }
+
+    public static function saveUserOwner($data, $group)
+    {
+        $user = new User;
+
+        $user->first_name = $data[1];
+        $user->middle_name = $data[2];
+        $user->last_name = $data[3];
+        $user->group = $group;
+        $user->access = $data[16];
+        $user->email = $data[4];
+        $user->mobile_number = $data[5];
+        $user->password = Hash::make($data[17]);
+        $user->is_owner = true;
+
+        if ($user->save()) {
+            return $user->id;
+        }
+    }
+    
 }
