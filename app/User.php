@@ -4,6 +4,9 @@ namespace App;
 
 use App\Distributor;
 Use App\DistributorUser;
+use App\Dealer;
+use App\DealerUser;
+use App\DistributorDealer;
 use App\Imports\AdminUsersImport;
 use App\Imports\DistributorUsersImport;
 use App\Imports\DistributorOwnerImport;
@@ -47,6 +50,15 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public static function convertCsvFileDataToArray($file)
+    {
+        $file = file_get_contents($file);  
+
+        $array_data = array_map("str_getcsv", preg_split('/\r*\n+|\r+/', $file));
+
+        return  $array_data;
+    }
 
     public static function importAdminUsers($file)
     {
@@ -128,15 +140,6 @@ class User extends Authenticatable
             }
     }
 
-    public static function convertCsvFileDataToArray($file)
-    {
-        $file = file_get_contents($file);  
-
-        $array_data = array_map("str_getcsv", preg_split('/\r*\n+|\r+/', $file));
-
-        return  $array_data;
-    }
-
     public static function saveOnUsersTable($data, $group)
     {
         $user = new User;
@@ -177,5 +180,86 @@ class User extends Authenticatable
             return $user->id;
         }
     }
+
+    public static function importDealers($file)
+    {
+        $unique_exist_row = [];
+        $success = " ";
+
+        $data = self::convertCsvFileDataToArray($file);
+        
+        $rows = count($data);
+
+        for($i = 1; $i<$rows-1; $i++)
+        {
+            $email_exist = self::where('email', '=', $data[$i][4])->first();
+
+            if(!$email_exist)
+            {
+
+                $user_id = 0;
+                $dealer_id = 0;
+
+                $user_id = self::saveOnUsersTable($data[$i], 3);
+               
+                $dealer = new Dealer;
+                
+                $dealer->dealer_name = $data[$i][0];
+
+                if ($dealer->save()) {
+                    $dealer_id = $dealer->id;
+                }
+                
+                $dealer_user = new DealerUser;
+
+                $dealer_user->user_id = $user_id;
+                $dealer_user->dealer_id = $dealer_id;
+                $dealer_user->is_dealer = true;
+
+                if ($dealer_user->save()) {
+
+                    $success =  self::saveDealerUserOwner($data[$i],$dealer_id);
+                }
+
+            }else{
+                array_push($unique_exist_row, $i+1);
+            }
+        }
+
+        if($unique_exist_row)
+        {
+            return redirect()->back()->with('error', 'Email in row(s) '. implode(', ',$unique_exist_row) . ' already EXIST not save in DB');
+        
+        }else{
+
+            return redirect()->back()->with('message', $success);
+        }
+    }
     
+    public static function saveDealerUserOwner($data, $dealer_id)
+    {
+            $user_id = self::saveUserOwner($data, 3);
+
+            $dealer_user = new DealerUser;
+
+            $dealer_user->user_id = $user_id;
+            $dealer_user->dealer_id = $dealer_id;
+            $dealer_user->is_dealer = false;
+
+            if ($dealer_user->save()) {
+                return self::saveDealerDistributor($dealer_id, $data[13]);
+            }
+    }
+
+    public static function saveDealerDistributor($dealer_id, $distributor_id)
+    {    
+        $dist_deal = new DistributorDealer;
+
+        $dist_deal->distributor_id = $distributor_id;
+        $dist_deal->dealer_id = $dealer_id;
+
+        if ($dist_deal->save()) {
+            return 'Dealer Import Successful!';
+        }
+    }
 }

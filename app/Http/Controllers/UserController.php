@@ -16,4 +16,9 @@ class UserController extends Controller
     {
         return User::importDistributors(request()->file('distributor_user_file'));
     }
+
+    public function importDealers()
+    {
+        return User::importDealers(request()->file('dealer_user_file'));
+    }
 }

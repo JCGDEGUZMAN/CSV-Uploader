@@ -66,6 +66,12 @@
             <input type="file" name="distributor_user_file" class="importer-input" required>
             <button class="import-buttons">IMPORT DISTRIBUTORS</button>
         </form>
+        <form action="{{ route('importDealers') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="importer-title">DEALER IMPORTER</div>
+            <input type="file" name="dealer_user_file" class="importer-input" required>
+            <button class="import-buttons">IMPORT DEALERS</button>
+        </form>
     </div>
 </body>
 </html>
