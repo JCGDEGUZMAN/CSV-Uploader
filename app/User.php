@@ -251,11 +251,19 @@ class User extends Authenticatable
             }
     }
 
-    public static function saveDealerDistributor($dealer_id, $distributor_id)
+    public static function saveDealerDistributor($dealer_id, $distributor_email)
     {    
+        $user_id = User::where('email', '=', $distributor_email)
+            ->select('id')
+            ->first();
+
+        $distributor_id = DistributorUser::where('user_id', '=', $user_id["id"])
+            ->select('distributor_id')
+            ->first();
+            
         $dist_deal = new DistributorDealer;
 
-        $dist_deal->distributor_id = $distributor_id;
+        $dist_deal->distributor_id = $distributor_id["distributor_id"];
         $dist_deal->dealer_id = $dealer_id;
 
         if ($dist_deal->save()) {
