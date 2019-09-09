@@ -1,2 +1,2 @@
-product_number,product_name,product_description,category,unit,weight,size,price,srp
-PRODUCT0001,PRODUCT0001,PRODUCT0001,1,kgs,10,10x20x30,120,125
+product_number,product_name,product_description,category,unit,weight,size,price,srp,photo
+PRODUCT0001,PRODUCT0001,PRODUCT0001,1,kgs,10,10x20x30,120,125,sample.png

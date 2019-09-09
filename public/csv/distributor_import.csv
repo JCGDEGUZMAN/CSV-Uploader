@@ -1,2 +1,2 @@
-company_name,owner_first_name,owner_middle_name,owner_last_name,owner_email,owner_mobile_number,region,zone,province,city,barangay,street,zip_code,category,DSM,capacity,access,password
-distributor 1,fname,mname,lname,distributor@email.com,89789687788,1,1,1,1,1,1,1234,"[1,2,3,4]",qwerty,120,1,Distributor@11
+company_name,owner_first_name,owner_middle_name,owner_last_name,owner_email,owner_mobile_number,region,zone,province,city,barangay,street,zip_code,category,DSM,capacity,access,password,photo
+distributor 1,fname,mname,lname,distributor3@email.com,89789687788,1,1,1,1,1,1,1234,"[1,2,3,4]",qwerty,120,1,Distributor@11,sample.png

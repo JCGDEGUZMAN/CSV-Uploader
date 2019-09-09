@@ -153,6 +153,8 @@ class User extends Authenticatable
         $user->zone = $data[7];
         $user->region = $data[6];
         $user->zip_code = $data[12];
+        $user->photo = $data[18];
+        $user->photo = $data[18];
         $user->sales_coordinator = $data[14];
         $user->capacity = $data[15];
 
